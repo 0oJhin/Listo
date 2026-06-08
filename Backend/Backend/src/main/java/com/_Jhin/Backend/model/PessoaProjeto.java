@@ -42,5 +42,20 @@ public class PessoaProjeto {
     public void setNivelAcesso(int nivelAcesso){
         this.nivelAcesso=nivelAcesso;
     }
+    public Pessoa getPessoa() {
+    return pessoa;
+}
+
+public void setPessoa(Pessoa pessoa) {
+    this.pessoa = pessoa;
+}
+
+public Projeto getProjeto() {
+    return projeto;
+}
+
+public void setProjeto(Projeto projeto) {
+    this.projeto = projeto;
+}
 
 }

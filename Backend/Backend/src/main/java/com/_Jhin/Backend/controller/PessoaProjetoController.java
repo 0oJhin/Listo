@@ -5,9 +5,12 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com._Jhin.Backend.model.PessoaProjeto;
 import com._Jhin.Backend.repository.PessoaProjetoRepository;
+
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
 
@@ -29,4 +32,22 @@ public class PessoaProjetoController {
     public PessoaProjeto salvar(@RequestBody PessoaProjeto pessoa) {
     return r1.save(pessoa);
     }
+
+    @PutMapping("/{id_PessoaProjeto}")
+    public void atualizarPessoaProjeto(
+        @PathVariable Long id_PessoaProjeto,
+        @RequestBody PessoaProjeto pessoaProjetoAtualizado) {
+
+    PessoaProjeto pessoaprojeto = r1.findById(id_PessoaProjeto).orElse(null);
+
+    if (pessoaprojeto != null) {
+        pessoaprojeto.setNivelAcesso(pessoaProjetoAtualizado.getNivelAcesso());
+        r1.save(pessoaprojeto);
+    }
+    }
+    @DeleteMapping("/{id_PessoaProjeto}")
+    public void deletarPessoaProjeto(@PathVariable Long id_PessoaProjeto) {
+    r1.deleteById(id_PessoaProjeto);
+    }
+    
 }

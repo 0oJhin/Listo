@@ -1,7 +1,15 @@
 package com._Jhin.Backend.model;
 
 import jakarta.persistence.*;
-
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+@JsonPropertyOrder({
+    "id_Item",
+    "nomeItem",
+    "quantidade",
+    "concluido",
+    "isTarefa"
+})
 @Entity
 public class ItemLista {
 
@@ -23,9 +31,10 @@ public class ItemLista {
     @Column(name="tarefa")
     private boolean isTarefa;
 
-    @ManyToOne
-    @JoinColumn(name = "id_Lista")
-    private Lista lista;
+   @ManyToOne
+@JoinColumn(name = "id_lista")
+@JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+private Lista lista;
 
     public Long getId_Item() {
         return id_Item;

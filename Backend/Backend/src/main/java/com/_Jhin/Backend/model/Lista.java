@@ -2,7 +2,15 @@ package com._Jhin.Backend.model;
 
 import jakarta.persistence.*;
 import java.util.List;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
+@JsonPropertyOrder({
+    "idLista",
+    "nomeLista",
+    "feito",
+    "projeto",
+    "itens"
+})
 
 @Entity
 public class Lista {
@@ -20,7 +28,7 @@ public class Lista {
     private boolean feito;
 
     @ManyToOne
-    @JoinColumn(name = "id_Projeto")
+    @JoinColumn(name = "id_projeto")
     private Projeto projeto;
 
     @OneToMany(mappedBy = "lista")
@@ -35,15 +43,28 @@ public class Lista {
     public String getNomeLista(){
         return nomeLista;
     }
-    public void setNome(String nome){
+    public void setNomeLista(String nome){
         this.nomeLista=nome;
     }
     public boolean isFeito() {
         return feito;
     }
 
-    public void setConcluido(boolean feito) {
-        this.feito = feito;
+    public void setFeito(boolean feito) {
+    this.feito = feito;
     }
-        
+     public Projeto getProjeto() {
+    return projeto;
+    }
+
+    public void setProjeto(Projeto projeto) {
+    this.projeto = projeto;
+    }
+    public List<ItemLista> getItens() {
+    return itens;
+    }
+
+    public void setItens(List<ItemLista> itens) {
+    this.itens = itens;
+    }   
 }
