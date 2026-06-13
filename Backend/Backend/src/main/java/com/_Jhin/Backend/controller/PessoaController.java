@@ -4,7 +4,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com._Jhin.Backend.model.Pessoa;
-import com._Jhin.Backend.repository.PessoaRepository;
+import com._Jhin.Backend.Service.PessoaService;
 
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -19,36 +19,28 @@ import org.springframework.web.bind.annotation.RequestBody;
 @RequestMapping("/Pessoa")
 public class PessoaController {
     
-    private final PessoaRepository r1;
-    
-    public PessoaController(PessoaRepository repository){
-        this.r1 =  repository;
+    private final PessoaService service;
+    public PessoaController(PessoaService service){
+        this.service =  service;
     }
+
     @GetMapping("/{id_Pessoa}")
     public Pessoa getPessoa(@PathVariable Long id_Pessoa) {
-    return r1.findById(id_Pessoa).orElse(null);
+    return service.encontrarPessoa(id_Pessoa);
     }
+
     @PostMapping
     public Pessoa salvar(@RequestBody Pessoa pessoa) {
-    return r1.save(pessoa);
+    return service.salvar(pessoa);
     }
+
     @PutMapping("/{id_Pessoa}")
-    public void atualizarPessoa(
-        @PathVariable Long id_Pessoa,
-        @RequestBody Pessoa pessoaAtualizada) {
-
-    Pessoa pessoa = r1.findById(id_Pessoa).orElse(null);
-
-    if (pessoa != null) {
-        pessoa.setNomePessoa(pessoaAtualizada.getNomePessoa());
-        pessoa.setSenha(pessoaAtualizada.getSenha());
-
-        r1.save(pessoa);
+    public void atualizarPessoa(     @PathVariable Long id_Pessoa, @RequestBody Pessoa pessoaAtualizada) {
+        service.atualizaPessoa(id_Pessoa, pessoaAtualizada);
     }
-    }
+    
     @DeleteMapping("/{id_Pessoa}")
     public void deletarPessoa(@PathVariable long id_Pessoa){
-        r1.deleteById(id_Pessoa);
-
+        service.deletarPessoa(id_Pessoa);
     }
 }

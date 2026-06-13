@@ -19,10 +19,10 @@ public class Projeto {
         @OneToMany(mappedBy = "projeto")
         private List<Lista> listas;
 
-        public long getIdProjeto(){
+        public Long getIdProjeto(){
                 return id_Projeto;
         }
-        public void setIdProjeto(long idProjeto){
+        public void setIdProjeto(Long idProjeto){
                 this.id_Projeto=idProjeto;
         }
         public String getNomeProjeto(){

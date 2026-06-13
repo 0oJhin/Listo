@@ -53,7 +53,8 @@ public class Lista {
     public void setFeito(boolean feito) {
     this.feito = feito;
     }
-     public Projeto getProjeto() {
+    
+    public Projeto getProjeto() {
     return projeto;
     }
 

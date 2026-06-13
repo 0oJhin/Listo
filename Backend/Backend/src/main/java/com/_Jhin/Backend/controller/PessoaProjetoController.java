@@ -3,8 +3,8 @@ package com._Jhin.Backend.controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com._Jhin.Backend.Service.PessoaProjetoService;
 import com._Jhin.Backend.model.PessoaProjeto;
-import com._Jhin.Backend.repository.PessoaProjetoRepository;
 
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -19,35 +19,32 @@ import org.springframework.web.bind.annotation.RequestBody;
 @RequestMapping("/PessoaProjeto")
 public class PessoaProjetoController {
     
-    private final PessoaProjetoRepository r1;
+    private final PessoaProjetoService service;
     
-    public PessoaProjetoController(PessoaProjetoRepository repository){
-        this.r1 =  repository;
+    public PessoaProjetoController(PessoaProjetoService service){
+        this.service=service;
     }
+
     @GetMapping("/{id_PessoaProjeto}")
     public PessoaProjeto getPessoaProjeto(@PathVariable Long id_PessoaProjeto) {
-        return r1.findById(id_PessoaProjeto).orElse(null);
+        return service.buscarPessoaProjetoid(id_PessoaProjeto);
     }
+
     @PostMapping
     public PessoaProjeto salvar(@RequestBody PessoaProjeto pessoa) {
-    return r1.save(pessoa);
+    return service.salvar(pessoa);
     }
 
     @PutMapping("/{id_PessoaProjeto}")
     public void atualizarPessoaProjeto(
         @PathVariable Long id_PessoaProjeto,
         @RequestBody PessoaProjeto pessoaProjetoAtualizado) {
-
-    PessoaProjeto pessoaprojeto = r1.findById(id_PessoaProjeto).orElse(null);
-
-    if (pessoaprojeto != null) {
-        pessoaprojeto.setNivelAcesso(pessoaProjetoAtualizado.getNivelAcesso());
-        r1.save(pessoaprojeto);
+        service.atualizarPessoaProjeto(id_PessoaProjeto, pessoaProjetoAtualizado);
     }
-    }
+
     @DeleteMapping("/{id_PessoaProjeto}")
     public void deletarPessoaProjeto(@PathVariable Long id_PessoaProjeto) {
-    r1.deleteById(id_PessoaProjeto);
+    service.deletarPessoaProjeto(id_PessoaProjeto);
     }
     
 }
