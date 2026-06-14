@@ -78,5 +78,23 @@ public List<PessoaProjeto> listarProjetosDaPessoa(
 
     return service.listarProjetosDaPessoa(idPessoa);
 }
+@GetMapping("/projeto/{idProjeto}")
+public List<PessoaProjeto> listarPessoasDoProjeto(
+        @PathVariable("idProjeto") Long idProjeto) {
 
+    return service.listarPessoasDoProjeto(idProjeto);
+}
+@PutMapping("/alterar-nivel/{idPessoaLogada}/{idPessoaAlvo}/{idProjeto}/{novoNivel}")
+public void alterarNivelPessoa(
+        @PathVariable("idPessoaLogada") Long idPessoaLogada,
+        @PathVariable("idPessoaAlvo") Long idPessoaAlvo,
+        @PathVariable("idProjeto") Long idProjeto,
+        @PathVariable("novoNivel") int novoNivel) {
+
+    service.alterarNivelPessoa(
+            idPessoaLogada,
+            idPessoaAlvo,
+            idProjeto,
+            novoNivel);
+}
 }

@@ -9,4 +9,6 @@ public interface PessoaProjetoRepository extends JpaRepository <PessoaProjeto, L
     void deleteByProjeto_IdProjeto(Long idProjeto);
 
     List<PessoaProjeto> findByPessoa_IdPessoa(Long idPessoa);
+
+    List<PessoaProjeto> findByProjeto_IdProjeto(Long idProjeto);
 }

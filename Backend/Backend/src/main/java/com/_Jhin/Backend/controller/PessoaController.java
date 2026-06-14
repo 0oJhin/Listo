@@ -54,6 +54,11 @@ public void atualizarPessoaComPermissao(
             idPessoa,
             pessoaAtualizada);
 }
+@GetMapping("/email/{email}")
+public Pessoa buscarPorEmail(
+        @PathVariable String email) {
 
+    return service.buscarPorEmail(email);
+}
     
 }

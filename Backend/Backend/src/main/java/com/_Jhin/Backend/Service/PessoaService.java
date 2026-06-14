@@ -69,4 +69,7 @@ public void atualizarPessoaComPermissao(
 
     atualizaPessoa(idPessoaAlvo, pessoaAtualizada);
 }
+public Pessoa buscarPorEmail(String email) {
+    return repository.findByEmail(email);
+}
 }

@@ -60,4 +60,11 @@ public void deletarProjetoComPermissao(
 public List<Projeto> listarTodos() {
     return service.listarTodos();
 }
+@PostMapping("/pessoa/{idPessoa}")
+public Projeto salvarProjetoComCriador(
+        @PathVariable Long idPessoa,
+        @RequestBody Projeto projeto) {
+
+    return service.salvarComCriador(idPessoa, projeto);
+}
 }

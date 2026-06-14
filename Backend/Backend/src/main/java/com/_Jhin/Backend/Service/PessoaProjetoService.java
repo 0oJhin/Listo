@@ -109,4 +109,36 @@ public class PessoaProjetoService {
 public List<PessoaProjeto> listarProjetosDaPessoa(Long idPessoa) {
     return repository.findByPessoa_IdPessoa(idPessoa);
 }
+
+public List<PessoaProjeto> listarPessoasDoProjeto(Long idProjeto) {
+    return repository.findByProjeto_IdProjeto(idProjeto);
+}
+public void alterarNivelPessoa(
+        Long idPessoaLogada,
+        Long idPessoaAlvo,
+        Long idProjeto,
+        int novoNivel) {
+
+    PessoaProjeto pessoaLogada = buscarPermissao(idPessoaLogada, idProjeto);
+    PessoaProjeto pessoaAlvo = buscarPermissao(idPessoaAlvo, idProjeto);
+
+    if (pessoaLogada == null || pessoaLogada.getNivelAcesso() < 2) {
+        throw new RuntimeException("Somente nível 2 ou 3 pode alterar níveis");
+    }
+
+    if (pessoaAlvo == null) {
+        throw new RuntimeException("Pessoa alvo não faz parte do projeto");
+    }
+
+    if (novoNivel < 1 || novoNivel > 2) {
+        throw new RuntimeException("Só é permitido alterar para nível 1 ou 2");
+    }
+
+    if (pessoaAlvo.getNivelAcesso() == 3) {
+        throw new RuntimeException("Não é possível alterar nível de um administrador");
+    }
+
+    pessoaAlvo.setNivelAcesso(novoNivel);
+    repository.save(pessoaAlvo);
+}
 }
