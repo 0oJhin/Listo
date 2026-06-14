@@ -83,4 +83,26 @@ public class PessoaProjetoService {
         PessoaProjeto permissao = buscarPermissao(idPessoa, idProjeto);
         return permissao != null && permissao.getNivelAcesso() == 3;
     }
+    public void transferirAdmin(
+        Long idAdminAtual,
+        Long idNovoAdmin,
+        Long idProjeto) {
+
+    PessoaProjeto adminAtual = buscarPermissao(idAdminAtual, idProjeto);
+    PessoaProjeto novoAdmin = buscarPermissao(idNovoAdmin, idProjeto);
+
+    if (adminAtual == null || adminAtual.getNivelAcesso() != 3) {
+        throw new RuntimeException("Somente nível 3 pode transferir administração");
+    }
+
+    if (novoAdmin == null) {
+        throw new RuntimeException("A pessoa precisa fazer parte do projeto");
+    }
+
+    adminAtual.setNivelAcesso(2);
+    novoAdmin.setNivelAcesso(3);
+
+    repository.save(adminAtual);
+    repository.save(novoAdmin);
+}
 }
