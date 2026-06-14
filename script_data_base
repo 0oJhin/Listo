@@ -1,0 +1,65 @@
+DROP TABLE IF EXISTS pessoa_projeto CASCADE;
+DROP TABLE IF EXISTS item_lista CASCADE;
+DROP TABLE IF EXISTS lista CASCADE;
+DROP TABLE IF EXISTS projeto CASCADE;
+DROP TABLE IF EXISTS pessoa CASCADE;
+
+
+CREATE TABLE pessoa (
+    id_pessoa SERIAL PRIMARY KEY,
+    nome_pessoa VARCHAR(100) NOT NULL,
+    email VARCHAR(100) NOT NULL UNIQUE,
+    senha VARCHAR(255) NOT NULL
+);
+
+
+CREATE TABLE projeto (
+    id_projeto SERIAL PRIMARY KEY,
+    nome_projeto VARCHAR(100) NOT NULL
+);
+
+
+CREATE TABLE lista (
+    id_lista SERIAL PRIMARY KEY,
+    nome_lista VARCHAR(100) NOT NULL,
+    feito BOOLEAN DEFAULT FALSE,
+    id_projeto INTEGER,
+
+    CONSTRAINT fk_lista_projeto
+        FOREIGN KEY (id_projeto)
+        REFERENCES projeto(id_projeto)
+        ON DELETE CASCADE
+);
+
+
+CREATE TABLE item_lista (
+    id_item SERIAL PRIMARY KEY,
+    nome_item VARCHAR(100) NOT NULL,
+    quantidade INTEGER DEFAULT 1,
+    concluido BOOLEAN DEFAULT FALSE,
+    tarefa BOOLEAN DEFAULT FALSE,
+    id_lista INTEGER,
+
+    CONSTRAINT fk_item_lista
+        FOREIGN KEY (id_lista)
+        REFERENCES lista(id_lista)
+        ON DELETE CASCADE
+);
+
+
+CREATE TABLE pessoa_projeto (
+    id_pessoa_projeto SERIAL PRIMARY KEY,
+    id_pessoa INTEGER,
+    id_projeto INTEGER,
+    nivel_acesso INTEGER,
+
+    CONSTRAINT fk_pessoa_projeto_pessoa
+        FOREIGN KEY (id_pessoa)
+        REFERENCES pessoa(id_pessoa)
+        ON DELETE CASCADE,
+
+    CONSTRAINT fk_pessoa_projeto_projeto
+        FOREIGN KEY (id_projeto)
+        REFERENCES projeto(id_projeto)
+        ON DELETE CASCADE
+);
