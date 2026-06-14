@@ -37,4 +37,37 @@ public class ItemListaController {
     public void deletarItemLista(@PathVariable Long id_Item) {
         service.deletarItemLista(id_Item);
     }
+    @PostMapping("/pessoa/{idPessoa}")
+public ItemLista salvarComPermissao(
+        @PathVariable("idPessoa") Long idPessoa,
+        @RequestBody ItemLista item) {
+
+    return service.salvarComPermissao(idPessoa, item);
+}
+@PutMapping("/{idItem}/pessoa/{idPessoa}")
+public void atualizarItemListaComPermissao(
+        @PathVariable("idItem") Long idItem,
+        @PathVariable("idPessoa") Long idPessoa,
+        @RequestBody ItemLista itemAtualizado) {
+
+    service.atualizarItemListaComPermissao(idPessoa, idItem, itemAtualizado);
+}
+@DeleteMapping("/{idItem}/pessoa/{idPessoa}")
+public void deletarItemListaComPermissao(
+        @PathVariable("idItem") Long idItem,
+        @PathVariable("idPessoa") Long idPessoa) {
+
+    service.deletarItemListaComPermissao(idPessoa, idItem);
+}
+@PutMapping("/{idItem}/concluido/{idPessoa}")
+public void alterarConcluido(
+        @PathVariable("idItem") Long idItem,
+        @PathVariable("idPessoa") Long idPessoa,
+        @RequestBody ItemLista itemAtualizado) {
+
+    service.alterarConcluidoComPermissao(
+            idPessoa,
+            idItem,
+            itemAtualizado.isConcluido());
+}
 }

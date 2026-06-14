@@ -44,4 +44,19 @@ public class PessoaService {
     public void deletarPessoa(long id){
         repository.deleteById(id);
     }
+    public Pessoa login(String email, String senha) {
+
+    Pessoa pessoa = repository.findByEmail(email);
+
+    if (pessoa == null) {
+        throw new RuntimeException("Email não encontrado");
+    }
+
+    if (!pessoa.getSenha().equals(senha)) {
+        throw new RuntimeException("Senha incorreta");
+    }
+
+    return pessoa;
+}
+
 }

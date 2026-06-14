@@ -6,10 +6,15 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class ListaService {
-    private final ListaRepository repository;
-    public ListaService(ListaRepository repository){
-        this.repository=repository;
-    }
+   private final ListaRepository repository;
+    private final PessoaProjetoService pessoaProjetoService;
+
+public ListaService(
+        ListaRepository repository,
+        PessoaProjetoService pessoaProjetoService) {
+    this.repository = repository;
+    this.pessoaProjetoService = pessoaProjetoService;
+}
 
     public Lista salvar(Lista lista){
         if (lista.getNomeLista() == null || lista.getNomeLista().isBlank()) {
@@ -40,4 +45,53 @@ public class ListaService {
         repository.deleteById(id);
     }
 
+
+    public Lista salvarComPermissao(Long idPessoa, Lista lista) {
+
+    Long idProjeto = lista.getProjeto().getIdProjeto();
+
+    if (!pessoaProjetoService.podeEditar(idPessoa, idProjeto)) {
+        throw new RuntimeException("Somente nível 2 ou 3 pode criar listas");
+    }
+
+    return salvar(lista);
+}
+public void atualizarListaComPermissao(
+        Long idPessoa,
+        Long idLista,
+        Lista listaAtualizada) {
+
+    Lista lista = repository.findById(idLista).orElse(null);
+
+    if (lista == null) {
+        throw new RuntimeException("Lista não encontrada");
+    }
+
+    Long idProjeto = lista.getProjeto().getIdProjeto();
+
+    if (!pessoaProjetoService.podeEditar(idPessoa, idProjeto)) {
+        throw new RuntimeException("Somente nível 2 ou 3 pode alterar listas");
+    }
+
+    lista.setNomeLista(listaAtualizada.getNomeLista());
+    lista.setFeito(listaAtualizada.isFeito());
+
+    repository.save(lista);
+}
+public void deletarListaComPermissao(Long idPessoa, Long idLista) {
+
+    Lista lista = repository.findById(idLista).orElse(null);
+
+    if (lista == null) {
+        throw new RuntimeException("Lista não encontrada");
+    }
+
+    Long idProjeto = lista.getProjeto().getIdProjeto();
+
+    if (!pessoaProjetoService.podeEditar(idPessoa, idProjeto)) {
+        throw new RuntimeException("Somente nível 2 ou 3 pode deletar listas");
+    }
+
+    repository.deleteById(idLista);
+}
 }

@@ -45,5 +45,26 @@ public class ListaController {
     public void deletarListaController(@PathVariable Long id_Lista){
         service.deletarLista(id_Lista);
     }
-    
+    @PostMapping("/pessoa/{idPessoa}")
+public Lista salvarComPermissao(
+        @PathVariable("idPessoa") Long idPessoa,
+        @RequestBody Lista lista) {
+
+    return service.salvarComPermissao(idPessoa, lista);
+}
+@PutMapping("/{idLista}/pessoa/{idPessoa}")
+public void atualizarListaComPermissao(
+        @PathVariable("idLista") Long idLista,
+        @PathVariable("idPessoa") Long idPessoa,
+        @RequestBody Lista listaAtualizada) {
+
+    service.atualizarListaComPermissao(idPessoa, idLista, listaAtualizada);
+}
+@DeleteMapping("/{idLista}/pessoa/{idPessoa}")
+public void deletarListaComPermissao(
+        @PathVariable("idLista") Long idLista,
+        @PathVariable("idPessoa") Long idPessoa) {
+
+    service.deletarListaComPermissao(idPessoa, idLista);
+}
 }

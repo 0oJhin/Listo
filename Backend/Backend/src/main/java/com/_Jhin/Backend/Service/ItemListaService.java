@@ -4,14 +4,24 @@ import org.springframework.stereotype.Service;
 
 import com._Jhin.Backend.model.ItemLista;
 import com._Jhin.Backend.repository.ItemListaRepository;
+import com._Jhin.Backend.repository.ListaRepository;
+import com._Jhin.Backend.model.Lista;
 
 @Service
 public class ItemListaService {
-    private final ItemListaRepository repository;
+private final ItemListaRepository repository;
+private final PessoaProjetoService pessoaProjetoService;
+private final ListaRepository listaRepository;
 
-    public ItemListaService(ItemListaRepository repository){
-        this.repository= repository;
-    }
+public ItemListaService(
+        ItemListaRepository repository,
+        PessoaProjetoService pessoaProjetoService,
+        ListaRepository listaRepository) {
+    this.repository = repository;
+    this.pessoaProjetoService = pessoaProjetoService;
+    this.listaRepository = listaRepository;
+}
+    
 
     public ItemLista salvar(ItemLista item){
         if(item.getIsTarefa()){
@@ -51,6 +61,78 @@ public class ItemListaService {
 
         repository.save(item);
     }
+}
+public ItemLista salvarComPermissao(Long idPessoa, ItemLista item) {
+
+    Long idLista = item.getLista().getIdLista();
+
+    Lista lista = listaRepository.findById(idLista)
+            .orElseThrow(() -> new RuntimeException("Lista não encontrada"));
+
+    Long idProjeto = lista.getProjeto().getIdProjeto();
+
+    if (!pessoaProjetoService.podeEditar(idPessoa, idProjeto)) {
+        throw new RuntimeException("Somente nível 2 ou 3 pode criar itens");
+    }
+
+    item.setLista(lista);
+
+    return salvar(item);
+}
+public void atualizarItemListaComPermissao(
+        Long idPessoa,
+        Long idItem,
+        ItemLista itemAtualizado) {
+
+    ItemLista item = repository.findById(idItem).orElse(null);
+
+    if (item == null) {
+        throw new RuntimeException("Item não encontrado");
+    }
+
+    Long idProjeto = item.getLista().getProjeto().getIdProjeto();
+
+    if (!pessoaProjetoService.podeEditar(idPessoa, idProjeto)) {
+        throw new RuntimeException("Somente nível 2 ou 3 pode alterar itens");
+    }
+
+    atualizarItemLista(idItem, itemAtualizado);
+}
+public void deletarItemListaComPermissao(Long idPessoa, Long idItem) {
+
+    ItemLista item = repository.findById(idItem).orElse(null);
+
+    if (item == null) {
+        throw new RuntimeException("Item não encontrado");
+    }
+
+    Long idProjeto = item.getLista().getProjeto().getIdProjeto();
+
+    if (!pessoaProjetoService.podeEditar(idPessoa, idProjeto)) {
+        throw new RuntimeException("Somente nível 2 ou 3 pode deletar itens");
+    }
+
+    repository.deleteById(idItem);
+}
+public void alterarConcluidoComPermissao(
+        Long idPessoa,
+        Long idItem,
+        boolean concluido) {
+
+    ItemLista item = repository.findById(idItem).orElse(null);
+
+    if (item == null) {
+        throw new RuntimeException("Item não encontrado");
+    }
+
+    Long idProjeto = item.getLista().getProjeto().getIdProjeto();
+
+    if (!pessoaProjetoService.podeMarcarFeito(idPessoa, idProjeto)) {
+        throw new RuntimeException("A pessoa não faz parte do projeto");
+    }
+
+    item.setConcluido(concluido);
+    repository.save(item);
 }
 
 }

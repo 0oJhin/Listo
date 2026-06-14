@@ -15,11 +15,10 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 @Entity
 public class Lista {
 
-    @Id
+   @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    
     @Column(name="id_lista")
-    private long id_Lista;
+    private Long idLista;
 
     @Column(name="nome_lista")
     private String nomeLista;
@@ -34,11 +33,12 @@ public class Lista {
     @OneToMany(mappedBy = "lista")
     private List<ItemLista> itens;
     
-    public long getIdLista(){
-        return id_Lista;
-    }        
-    public void setIdLista(Long id_Lista){
-        this.id_Lista= id_Lista;
+    public Long getIdLista() {
+    return idLista;
+    }
+
+    public void setIdLista(Long idLista) {
+    this.idLista = idLista;
     }
     public String getNomeLista(){
         return nomeLista;

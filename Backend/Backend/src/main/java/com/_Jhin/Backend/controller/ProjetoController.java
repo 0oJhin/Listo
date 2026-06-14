@@ -47,4 +47,13 @@ public class ProjetoController {
     public void deletarProjeto(@PathVariable Long id_Projeto) {
     service.deletarProjeto(id_Projeto);
     }
+    @DeleteMapping("/{idProjeto}/pessoa/{idPessoa}")
+public void deletarProjetoComPermissao(
+        @PathVariable("idProjeto") Long idProjeto,
+        @PathVariable("idPessoa") Long idPessoa) {
+
+    service.deletarProjetoComPermissao(
+            idPessoa,
+            idProjeto);
+}
 }

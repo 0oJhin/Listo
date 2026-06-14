@@ -7,29 +7,30 @@ import java.util.List;
 @Entity
 public class Projeto {
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id_projeto")
+    private Long idProjeto;
 
-        @Id
-        @GeneratedValue(strategy = GenerationType.IDENTITY)
-        @Column(name = "id_projeto")
-        private Long id_Projeto;
+    @Column(name = "nome_projeto")
+    private String nomeProjeto;
 
-        @Column(name = "nome_projeto")
-        private String nomeProjeto;     
+    @OneToMany(mappedBy = "projeto")
+    private List<Lista> listas;
 
-        @OneToMany(mappedBy = "projeto")
-        private List<Lista> listas;
+    public Long getIdProjeto() {
+        return idProjeto;
+    }
 
-        public Long getIdProjeto(){
-                return id_Projeto;
-        }
-        public void setIdProjeto(Long idProjeto){
-                this.id_Projeto=idProjeto;
-        }
-        public String getNomeProjeto(){
-                return nomeProjeto;
-        }
-        public void setNomeProjeto(String nomeProjeto){
-                this.nomeProjeto=nomeProjeto;
-        }
+    public void setIdProjeto(Long idProjeto) {
+        this.idProjeto = idProjeto;
+    }
 
+    public String getNomeProjeto() {
+        return nomeProjeto;
+    }
+
+    public void setNomeProjeto(String nomeProjeto) {
+        this.nomeProjeto = nomeProjeto;
+    }
 }

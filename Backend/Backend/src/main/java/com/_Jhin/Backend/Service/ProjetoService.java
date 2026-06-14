@@ -1,16 +1,36 @@
 package com._Jhin.Backend.Service;
 
+import com._Jhin.Backend.model.Lista;
 import com._Jhin.Backend.model.Projeto;
 import com._Jhin.Backend.repository.ProjetoRepository;
 import org.springframework.stereotype.Service;
+import java.util.List;
 
+import com._Jhin.Backend.repository.ListaRepository;
+import com._Jhin.Backend.repository.ItemListaRepository;
+import com._Jhin.Backend.repository.PessoaProjetoRepository;
+import jakarta.transaction.Transactional;
 @Service
 public class ProjetoService {
-    private final ProjetoRepository repository;
-    public ProjetoService(ProjetoRepository repository){
-        this.repository=repository;
-    }
+  private final ProjetoRepository repository;
+private final PessoaProjetoService pessoaProjetoService;
+private final ListaRepository listaRepository;
+private final ItemListaRepository itemListaRepository;
+private final PessoaProjetoRepository pessoaProjetoRepository;
 
+public ProjetoService(
+        ProjetoRepository repository,
+        PessoaProjetoService pessoaProjetoService,
+        ListaRepository listaRepository,
+        ItemListaRepository itemListaRepository,
+        PessoaProjetoRepository pessoaProjetoRepository) {
+
+    this.repository = repository;
+    this.pessoaProjetoService = pessoaProjetoService;
+    this.listaRepository = listaRepository;
+    this.itemListaRepository = itemListaRepository;
+    this.pessoaProjetoRepository = pessoaProjetoRepository;
+}
     public Projeto salvar(Projeto projeto){
         
         if(projeto.getNomeProjeto()==null){
@@ -35,4 +55,21 @@ public class ProjetoService {
     public void deletarProjeto(Long id){
         repository.deleteById(id);
     }
+   @Transactional
+    public void deletarProjetoComPermissao(Long idPessoa, Long idProjeto) {
+
+    if (!pessoaProjetoService.ehAdmin(idPessoa, idProjeto)) {
+        throw new RuntimeException("Somente nível 3 pode deletar projetos");
+    }
+
+    List<Lista> listas = listaRepository.findByProjeto_IdProjeto(idProjeto);
+
+    for (Lista lista : listas) {
+        itemListaRepository.deleteByLista_IdLista(lista.getIdLista());
+    }
+
+    listaRepository.deleteByProjeto_IdProjeto(idProjeto);
+    pessoaProjetoRepository.deleteByProjeto_IdProjeto(idProjeto);
+    repository.deleteById(idProjeto);
+}
 }

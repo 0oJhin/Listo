@@ -1,6 +1,8 @@
 package com._Jhin.Backend.model;
 
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import jakarta.persistence.*;
 
 
@@ -8,10 +10,9 @@ import jakarta.persistence.*;
 public class Pessoa {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    
-    @Column(name="id_Pesssoa")
-    private long id_Pesssoa;
+@GeneratedValue(strategy = GenerationType.IDENTITY)
+@Column(name = "id_pessoa")
+private Long idPessoa;
 
     @Column(name="nome_Pessoa")
     private String nomePessoa;
@@ -19,15 +20,17 @@ public class Pessoa {
     @Column(name="email")
     private String email;
     
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     @Column(name="senha")
     private String senha;
 
-    public long getIdPessoa(){
-        return id_Pesssoa;
-    }
-    public void setIdPessoa(long id_Pessoa){
-        this.id_Pesssoa=id_Pessoa;
-    }
+    public Long getIdPessoa() {
+    return idPessoa;
+}
+
+public void setIdPessoa(Long idPessoa) {
+    this.idPessoa = idPessoa;
+}
     public String getNomePessoa(){
         return nomePessoa;
     }
