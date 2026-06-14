@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'core/app_colors.dart';
-import 'pages/login_page.dart';
+import 'screens/login_screen.dart';
 
 void main() {
   runApp(const ListoApp());
@@ -27,7 +27,7 @@ class ListoApp extends StatelessWidget {
           behavior: SnackBarBehavior.floating,
         ),
       ),
-      home: const LoginPage(),
+      home: const LoginScreen(),
     );
   }
 }

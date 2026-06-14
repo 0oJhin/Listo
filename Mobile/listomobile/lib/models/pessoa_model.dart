@@ -4,7 +4,7 @@ class PessoaModel {
   final String email;
   final String senha;
 
-  PessoaModel({
+  const PessoaModel({
     this.idPessoa,
     required this.nomePessoa,
     required this.email,
@@ -30,7 +30,8 @@ class PessoaModel {
   }
 
   static int? _parseId(Map<String, dynamic> json) {
-    final dynamic value = json['idPessoa'] ??
+    final dynamic value =
+        json['idPessoa'] ??
         json['id_Pessoa'] ??
         json['id_pessoa'] ??
         json['id_Pesssoa'];
