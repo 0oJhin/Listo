@@ -4,6 +4,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import com._Jhin.Backend.model.Lista;
 import com._Jhin.Backend.Service.ListaService;
+import java.util.List;
 
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -66,5 +67,15 @@ public void deletarListaComPermissao(
         @PathVariable("idPessoa") Long idPessoa) {
 
     service.deletarListaComPermissao(idPessoa, idLista);
+}
+@GetMapping
+public List<Lista> listarTodos() {
+    return service.listarTodos();
+}
+@GetMapping("/projeto/{idProjeto}")
+public List<Lista> listarPorProjeto(
+        @PathVariable("idProjeto") Long idProjeto) {
+
+    return service.listarPorProjeto(idProjeto);
 }
 }

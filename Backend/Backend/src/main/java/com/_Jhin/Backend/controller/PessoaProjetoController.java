@@ -5,6 +5,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com._Jhin.Backend.Service.PessoaProjetoService;
 import com._Jhin.Backend.model.PessoaProjeto;
+import java.util.List;
 
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -69,4 +70,13 @@ public void transferirAdmin(
 
     service.transferirAdmin(idAdminAtual, idNovoAdmin, idProjeto);
 }
+
+
+@GetMapping("/pessoa/{idPessoa}")
+public List<PessoaProjeto> listarProjetosDaPessoa(
+        @PathVariable Long idPessoa) {
+
+    return service.listarProjetosDaPessoa(idPessoa);
+}
+
 }

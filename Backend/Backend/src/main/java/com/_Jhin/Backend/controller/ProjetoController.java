@@ -5,7 +5,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com._Jhin.Backend.Service.ProjetoService;
 import com._Jhin.Backend.model.Projeto;
-
+import java.util.List;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -55,5 +55,9 @@ public void deletarProjetoComPermissao(
     service.deletarProjetoComPermissao(
             idPessoa,
             idProjeto);
+}
+@GetMapping
+public List<Projeto> listarTodos() {
+    return service.listarTodos();
 }
 }

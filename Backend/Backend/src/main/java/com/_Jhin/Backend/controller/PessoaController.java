@@ -43,4 +43,17 @@ public class PessoaController {
     public void deletarPessoa(@PathVariable long id_Pessoa){
         service.deletarPessoa(id_Pessoa);
     }
+    @PutMapping("/{idPessoa}/logado/{idPessoaLogada}")
+public void atualizarPessoaComPermissao(
+        @PathVariable("idPessoa") Long idPessoa,
+        @PathVariable("idPessoaLogada") Long idPessoaLogada,
+        @RequestBody Pessoa pessoaAtualizada) {
+
+    service.atualizarPessoaComPermissao(
+            idPessoaLogada,
+            idPessoa,
+            pessoaAtualizada);
+}
+
+    
 }

@@ -3,7 +3,7 @@ package com._Jhin.Backend.model;
 import jakarta.persistence.*;
 import java.util.List;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
-
+import com.fasterxml.jackson.annotation.JsonProperty;
 @JsonPropertyOrder({
     "idLista",
     "nomeLista",
@@ -28,9 +28,11 @@ public class Lista {
 
     @ManyToOne
     @JoinColumn(name = "id_projeto")
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private Projeto projeto;
 
     @OneToMany(mappedBy = "lista")
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private List<ItemLista> itens;
     
     public Long getIdLista() {

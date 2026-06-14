@@ -1,7 +1,7 @@
 package com._Jhin.Backend.Service;
 import com._Jhin.Backend.model.Lista;
 import com._Jhin.Backend.repository.ListaRepository;
-
+import java.util.List;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -93,5 +93,11 @@ public void deletarListaComPermissao(Long idPessoa, Long idLista) {
     }
 
     repository.deleteById(idLista);
+}
+public List<Lista> listarTodos() {
+    return repository.findAll();
+}
+public List<Lista> listarPorProjeto(Long idProjeto) {
+    return repository.findByProjeto_IdProjeto(idProjeto);
 }
 }

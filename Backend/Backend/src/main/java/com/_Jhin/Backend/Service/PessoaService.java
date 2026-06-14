@@ -58,5 +58,15 @@ public class PessoaService {
 
     return pessoa;
 }
+public void atualizarPessoaComPermissao(
+        Long idPessoaLogada,
+        Long idPessoaAlvo,
+        Pessoa pessoaAtualizada) {
 
+    if (!idPessoaLogada.equals(idPessoaAlvo)) {
+        throw new RuntimeException("Você só pode alterar sua própria conta");
+    }
+
+    atualizaPessoa(idPessoaAlvo, pessoaAtualizada);
+}
 }

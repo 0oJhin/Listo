@@ -3,6 +3,7 @@ package com._Jhin.Backend.Service;
 import com._Jhin.Backend.model.PessoaProjeto;
 import com._Jhin.Backend.repository.PessoaProjetoRepository;
 import org.springframework.stereotype.Service;
+import java.util.List;
 
 @Service
 public class PessoaProjetoService {
@@ -104,5 +105,8 @@ public class PessoaProjetoService {
 
     repository.save(adminAtual);
     repository.save(novoAdmin);
+}
+public List<PessoaProjeto> listarProjetosDaPessoa(Long idPessoa) {
+    return repository.findByPessoa_IdPessoa(idPessoa);
 }
 }

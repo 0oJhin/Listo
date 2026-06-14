@@ -4,7 +4,7 @@ import org.springframework.web.bind.annotation.*;
 
 import com._Jhin.Backend.Service.ItemListaService;
 import com._Jhin.Backend.model.ItemLista;
-
+import java.util.List;
 @RestController
 @RequestMapping("/itemLista")
 public class ItemListaController {
@@ -70,4 +70,15 @@ public void alterarConcluido(
             idItem,
             itemAtualizado.isConcluido());
 }
+@GetMapping
+public List<ItemLista> listarTodos() {
+    return service.listarTodos();
+}
+@GetMapping("/lista/{idLista}")
+public List<ItemLista> listarPorLista(
+        @PathVariable Long idLista) {
+
+    return service.listarPorLista(idLista);
+}
+
 }

@@ -6,7 +6,7 @@ import com._Jhin.Backend.model.ItemLista;
 import com._Jhin.Backend.repository.ItemListaRepository;
 import com._Jhin.Backend.repository.ListaRepository;
 import com._Jhin.Backend.model.Lista;
-
+import java.util.List;
 @Service
 public class ItemListaService {
 private final ItemListaRepository repository;
@@ -134,5 +134,10 @@ public void alterarConcluidoComPermissao(
     item.setConcluido(concluido);
     repository.save(item);
 }
-
+public List<ItemLista> listarTodos() {
+    return repository.findAll();
+}
+public List<ItemLista> listarPorLista(Long idLista) {
+    return repository.findByLista_IdLista(idLista);
+}
 }

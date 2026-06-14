@@ -72,4 +72,8 @@ public ProjetoService(
     pessoaProjetoRepository.deleteByProjeto_IdProjeto(idProjeto);
     repository.deleteById(idProjeto);
 }
+public List<Projeto> listarTodos() {
+    return repository.findAll();
+}
+
 }
