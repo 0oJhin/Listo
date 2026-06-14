@@ -61,4 +61,12 @@ public PessoaProjeto adicionarPessoaAoProjeto(
             idPessoaLogada,
             pessoaProjeto);
 }
+@PutMapping("/transferir-admin/{idAdminAtual}/{idNovoAdmin}/{idProjeto}")
+public void transferirAdmin(
+        @PathVariable("idAdminAtual") Long idAdminAtual,
+        @PathVariable("idNovoAdmin") Long idNovoAdmin,
+        @PathVariable("idProjeto") Long idProjeto) {
+
+    service.transferirAdmin(idAdminAtual, idNovoAdmin, idProjeto);
+}
 }
