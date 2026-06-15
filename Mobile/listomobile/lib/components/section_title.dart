@@ -4,13 +4,9 @@ import '../core/app_colors.dart';
 
 class SectionTitle extends StatelessWidget {
   final String title;
-  final int count;
+  final int? count;
 
-  const SectionTitle({
-    super.key,
-    required this.title,
-    required this.count,
-  });
+  const SectionTitle({super.key, required this.title, this.count});
 
   @override
   Widget build(BuildContext context) {
@@ -26,21 +22,23 @@ class SectionTitle extends StatelessWidget {
               fontWeight: FontWeight.w900,
             ),
           ),
-          const SizedBox(width: 8),
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 4),
-            decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.78),
-              borderRadius: BorderRadius.circular(999),
-            ),
-            child: Text(
-              '$count',
-              style: const TextStyle(
-                color: AppColors.text,
-                fontWeight: FontWeight.bold,
+          if (count != null) ...[
+            const SizedBox(width: 8),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 4),
+              decoration: BoxDecoration(
+                color: Colors.white.withValues(alpha: 0.78),
+                borderRadius: BorderRadius.circular(999),
+              ),
+              child: Text(
+                '$count',
+                style: const TextStyle(
+                  color: AppColors.text,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
             ),
-          ),
+          ],
         ],
       ),
     );
