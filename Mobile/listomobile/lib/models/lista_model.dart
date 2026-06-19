@@ -38,11 +38,18 @@ class ListaModel {
     final projeto = json['projeto'];
 
     return ListaModel(
-      idLista: _parseInt(json['idLista'] ?? json['id_Lista'] ?? json['id_lista']),
+      idLista: _parseInt(
+        json['idLista'] ?? json['id_Lista'] ?? json['id_lista'],
+      ),
       nomeLista: (json['nomeLista'] ?? json['nome_lista'] ?? '').toString(),
       feito: _parseBool(json['feito']),
       idProjeto: projeto is Map<String, dynamic>
-          ? (_parseInt(projeto['idProjeto'] ?? projeto['id_Projeto'] ?? projeto['id_projeto']) ?? 0)
+          ? (_parseInt(
+                  projeto['idProjeto'] ??
+                      projeto['id_Projeto'] ??
+                      projeto['id_projeto'],
+                ) ??
+                0)
           : 0,
     );
   }

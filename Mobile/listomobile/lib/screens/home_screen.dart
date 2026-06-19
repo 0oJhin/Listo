@@ -13,6 +13,7 @@ import 'home/widgets/home_shortcut_button.dart';
 import 'home/widgets/project_card.dart';
 import 'home/widgets/settings_dialog.dart';
 import 'login_screen.dart';
+import 'project/project_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   final PessoaModel pessoa;
@@ -84,6 +85,20 @@ class _HomeScreenState extends State<HomeScreen> {
 
   void _mensagem(String texto) {
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(texto)));
+  }
+
+  void _abrirProjeto(ProjetoModel projeto) {
+    final idPessoa = widget.pessoa.idPessoa;
+    if (idPessoa == null || projeto.idProjeto == null) {
+      _mensagem('Não foi possível abrir este projeto.');
+      return;
+    }
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => ProjectScreen(projeto: projeto, idPessoa: idPessoa),
+      ),
+    );
   }
 
   Future<void> _abrirConfiguracoes() async {
@@ -177,6 +192,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           child: ProjectCard(
                             name: recentes[index].nomeProjeto,
                             color: _corProjeto(index),
+                            onTap: () => _abrirProjeto(recentes[index]),
                           ),
                         ),
                       ),
@@ -218,6 +234,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       return ProjectCard(
                         name: _projetos[index].nomeProjeto,
                         color: _corProjeto(index),
+                        onTap: () => _abrirProjeto(_projetos[index]),
                       );
                     }, childCount: _projetos.length + 1),
                   ),
