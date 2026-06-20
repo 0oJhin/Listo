@@ -11,6 +11,8 @@ import 'home/widgets/empty_projects_prompt.dart';
 import 'home/widgets/home_header.dart';
 import 'home/widgets/home_shortcut_button.dart';
 import 'home/widgets/project_card.dart';
+import 'home/widgets/project_options_sheet.dart';
+import 'home/widgets/rename_project_dialog.dart';
 import 'home/widgets/settings_dialog.dart';
 import 'login_screen.dart';
 import 'project/project_screen.dart';
@@ -99,6 +101,111 @@ class _HomeScreenState extends State<HomeScreen> {
         builder: (_) => ProjectScreen(projeto: projeto, idPessoa: idPessoa),
       ),
     );
+  }
+
+  Future<void> _abrirOpcoesProjeto(ProjetoModel projeto) async {
+    final action = await showModalBottomSheet<ProjectAction>(
+      context: context,
+      useSafeArea: true,
+      isScrollControlled: true,
+      backgroundColor: Theme.of(context).colorScheme.surface,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
+      ),
+      builder: (_) => ProjectOptionsSheet(projectName: projeto.nomeProjeto),
+    );
+
+    if (!mounted || action == null) return;
+    switch (action) {
+      case ProjectAction.rename:
+        await _renomearProjeto(projeto);
+        break;
+      case ProjectAction.delete:
+        await _apagarProjeto(projeto);
+        break;
+    }
+  }
+
+  Future<void> _renomearProjeto(ProjetoModel projeto) async {
+    final novoNome = await showDialog<String>(
+      context: context,
+      builder: (_) => RenameProjectDialog(currentName: projeto.nomeProjeto),
+    );
+    if (novoNome == null || novoNome == projeto.nomeProjeto || !mounted) return;
+
+    final atualizado = projeto.copyWith(nomeProjeto: novoNome);
+    setState(() => _carregando = true);
+    try {
+      await _service.atualizarProjeto(atualizado);
+      if (!mounted) return;
+      setState(() {
+        final index = _projetos.indexWhere(
+          (item) => item.idProjeto == projeto.idProjeto,
+        );
+        if (index >= 0) _projetos[index] = atualizado;
+      });
+      _mensagem('Nome do projeto alterado.');
+    } catch (error) {
+      if (mounted) _mensagem(error.toString().replaceFirst('Exception: ', ''));
+    } finally {
+      if (mounted) setState(() => _carregando = false);
+    }
+  }
+
+  Future<void> _apagarProjeto(ProjetoModel projeto) async {
+    final confirmado = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        icon: Icon(
+          Icons.warning_amber_rounded,
+          color: Theme.of(dialogContext).colorScheme.error,
+        ),
+        title: const Text('Apagar projeto?'),
+        content: Text(
+          'Esta ação apagará "${projeto.nomeProjeto}", suas listas e seus itens. '
+          'Não será possível desfazer.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext, false),
+            child: const Text('Cancelar'),
+          ),
+          FilledButton(
+            style: FilledButton.styleFrom(
+              backgroundColor: Theme.of(dialogContext).colorScheme.error,
+              foregroundColor: Theme.of(dialogContext).colorScheme.onError,
+            ),
+            onPressed: () => Navigator.pop(dialogContext, true),
+            child: const Text('Apagar projeto'),
+          ),
+        ],
+      ),
+    );
+    if (confirmado != true || !mounted) return;
+
+    final idProjeto = projeto.idProjeto;
+    final idPessoa = widget.pessoa.idPessoa;
+    if (idProjeto == null || idPessoa == null) {
+      _mensagem('Não foi possível identificar o projeto ou usuário.');
+      return;
+    }
+
+    setState(() => _carregando = true);
+    try {
+      await _service.deletarProjetoComPermissao(
+        idProjeto: idProjeto,
+        idPessoa: idPessoa,
+      );
+      if (!mounted) return;
+      setState(() {
+        _projetos.removeWhere((item) => item.idProjeto == idProjeto);
+      });
+      _mensagem('Projeto apagado.');
+    } catch (error) {
+      if (mounted) _mensagem(error.toString().replaceFirst('Exception: ', ''));
+    } finally {
+      if (mounted) setState(() => _carregando = false);
+    }
   }
 
   Future<void> _abrirConfiguracoes() async {
@@ -193,6 +300,8 @@ class _HomeScreenState extends State<HomeScreen> {
                             name: recentes[index].nomeProjeto,
                             color: _corProjeto(index),
                             onTap: () => _abrirProjeto(recentes[index]),
+                            onOptionsPressed: () =>
+                                _abrirOpcoesProjeto(recentes[index]),
                           ),
                         ),
                       ),
@@ -235,6 +344,8 @@ class _HomeScreenState extends State<HomeScreen> {
                         name: _projetos[index].nomeProjeto,
                         color: _corProjeto(index),
                         onTap: () => _abrirProjeto(_projetos[index]),
+                        onOptionsPressed: () =>
+                            _abrirOpcoesProjeto(_projetos[index]),
                       );
                     }, childCount: _projetos.length + 1),
                   ),

@@ -134,6 +134,18 @@ class ProjetoService {
     }
   }
 
+  Future<void> deletarProjetoComPermissao({
+    required int idProjeto,
+    required int idPessoa,
+  }) async {
+    final response = await _client.delete(
+      Uri.parse('$baseUrl/Projeto/$idProjeto/pessoa/$idPessoa'),
+    );
+    if (response.statusCode != 200 && response.statusCode != 204) {
+      throw Exception(_mensagemErro('deletar projeto', response));
+    }
+  }
+
   String _mensagemErro(String acao, http.Response response) {
     return 'Erro ao $acao. Código: ${response.statusCode}. Resposta: ${response.body}';
   }

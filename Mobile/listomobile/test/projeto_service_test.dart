@@ -55,4 +55,15 @@ void main() {
 
     expect(requisicao, 2);
   });
+
+  test('deleta projeto usando a permissão da pessoa', () async {
+    final client = MockClient((request) async {
+      expect(request.method, 'DELETE');
+      expect(request.url.path, '/Projeto/7/pessoa/1');
+      return http.Response('', 204);
+    });
+
+    final service = ProjetoService(baseUrl: 'http://localhost', client: client);
+    await service.deletarProjetoComPermissao(idProjeto: 7, idPessoa: 1);
+  });
 }
