@@ -1,7 +1,12 @@
 package com._Jhin.Backend.Service;
 
+import com._Jhin.Backend.dto.AdicionarPessoaProjetoRequest;
+import com._Jhin.Backend.model.Pessoa;
 import com._Jhin.Backend.model.PessoaProjeto;
 import com._Jhin.Backend.repository.PessoaProjetoRepository;
+import com._Jhin.Backend.repository.PessoaRepository;
+import com._Jhin.Backend.repository.ProjetoRepository;
+
 import org.springframework.stereotype.Service;
 import java.util.List;
 
@@ -9,10 +14,18 @@ import java.util.List;
 public class PessoaProjetoService {
 
     private final PessoaProjetoRepository repository;
+    private final PessoaRepository pessoaRepository;
+    private final ProjetoRepository projetoRepository;
 
-    public PessoaProjetoService(PessoaProjetoRepository repository) {
-        this.repository = repository;
-    }
+public PessoaProjetoService(
+        PessoaProjetoRepository repository,
+        PessoaRepository pessoaRepository,
+        ProjetoRepository projetoRepository) {
+
+    this.repository = repository;
+    this.pessoaRepository = pessoaRepository;
+    this.projetoRepository = projetoRepository;
+}
 
     public PessoaProjeto salvar(PessoaProjeto pessoaProjeto) {
         if (pessoaProjeto.getPessoa() == null) {
@@ -26,7 +39,7 @@ public class PessoaProjetoService {
         if (pessoaProjeto.getNivelAcesso() < 1 || pessoaProjeto.getNivelAcesso() > 3) {
             throw new RuntimeException("nivel de acesso deve ser 1, 2 ou 3");
         }
-
+        validarPremiumParaNivel3(pessoaProjeto);
         return repository.save(pessoaProjeto);
     }
 
@@ -84,6 +97,7 @@ public class PessoaProjetoService {
         PessoaProjeto permissao = buscarPermissao(idPessoa, idProjeto);
         return permissao != null && permissao.getNivelAcesso() == 3;
     }
+    
     public void transferirAdmin(
         Long idAdminAtual,
         Long idNovoAdmin,
@@ -91,13 +105,24 @@ public class PessoaProjetoService {
 
     PessoaProjeto adminAtual = buscarPermissao(idAdminAtual, idProjeto);
     PessoaProjeto novoAdmin = buscarPermissao(idNovoAdmin, idProjeto);
-
+    
     if (adminAtual == null || adminAtual.getNivelAcesso() != 3) {
-        throw new RuntimeException("Somente nível 3 pode transferir administração");
+    throw new RuntimeException("Somente nível 3 pode transferir administração");
+    }
+    
+    if (novoAdmin == null) {
+    throw new RuntimeException("A pessoa precisa fazer parte do projeto");
+    }
+    if (idAdminAtual.equals(idNovoAdmin)) {
+    throw new RuntimeException("Não é possível transferir administração para si mesmo");
     }
 
-    if (novoAdmin == null) {
-        throw new RuntimeException("A pessoa precisa fazer parte do projeto");
+    if (!novoAdmin.getPessoa().isPremium()) {
+    long qtdAdmin = repository.countByPessoa_IdPessoaAndNivelAcesso(idNovoAdmin, 3);
+
+        if (qtdAdmin >= 1) {
+        throw new RuntimeException("Usuário gratuito só pode ser dono de 1 projeto");
+        }
     }
 
     adminAtual.setNivelAcesso(2);
@@ -140,5 +165,60 @@ public void alterarNivelPessoa(
 
     pessoaAlvo.setNivelAcesso(novoNivel);
     repository.save(pessoaAlvo);
+}
+private void validarPremiumParaNivel3(PessoaProjeto pessoaProjeto) {
+
+    if (pessoaProjeto.getNivelAcesso() == 3) {
+
+        Long idPessoa = pessoaProjeto.getPessoa().getIdPessoa();
+
+        Pessoa pessoaCompleta = pessoaRepository.findById(idPessoa)
+                .orElseThrow(() ->
+                        new RuntimeException("Pessoa não encontrada"));
+
+        long qtdAdmin = repository.countByPessoa_IdPessoaAndNivelAcesso(
+                idPessoa,
+                3);
+
+        if (!pessoaCompleta.isPremium() && qtdAdmin >= 1) {
+            throw new RuntimeException(
+                    "Usuário gratuito só pode ser dono de 1 projeto");
+        }
+    }
+}
+public PessoaProjeto adicionarPessoaPorEmail(
+        Long idPessoaLogada,
+        AdicionarPessoaProjetoRequest request) {
+
+    if (!podeEditar(idPessoaLogada, request.getIdProjeto())) {
+        throw new RuntimeException("Somente nível 2 ou 3 pode adicionar pessoas");
+    }
+
+    if (request.getNivelAcesso() < 1 || request.getNivelAcesso() > 2) {
+        throw new RuntimeException("Só é permitido adicionar nível 1 ou 2");
+    }
+
+    var pessoa = pessoaRepository.findByEmail(request.getEmail());
+
+    if (pessoa == null) {
+        throw new RuntimeException("Pessoa com esse email não encontrada");
+    }
+
+    var projeto = projetoRepository.findById(request.getIdProjeto()).orElse(null);
+
+    if (projeto == null) {
+        throw new RuntimeException("Projeto não encontrado");
+    }
+
+    if (buscarPermissao(pessoa.getIdPessoa(), request.getIdProjeto()) != null) {
+        throw new RuntimeException("Pessoa já faz parte desse projeto");
+    }
+
+    PessoaProjeto pessoaProjeto = new PessoaProjeto();
+    pessoaProjeto.setPessoa(pessoa);
+    pessoaProjeto.setProjeto(projeto);
+    pessoaProjeto.setNivelAcesso(request.getNivelAcesso());
+
+    return salvar(pessoaProjeto);
 }
 }

@@ -11,4 +11,6 @@ public interface PessoaProjetoRepository extends JpaRepository <PessoaProjeto, L
     List<PessoaProjeto> findByPessoa_IdPessoa(Long idPessoa);
 
     List<PessoaProjeto> findByProjeto_IdProjeto(Long idProjeto);
+
+    long countByPessoa_IdPessoaAndNivelAcesso(Long idPessoa, int nivelAcesso);
 }

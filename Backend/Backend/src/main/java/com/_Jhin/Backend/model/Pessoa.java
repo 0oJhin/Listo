@@ -24,6 +24,9 @@ private Long idPessoa;
     @Column(name="senha")
     private String senha;
 
+    @Column(name = "premium")
+    private boolean premium;
+    
     public Long getIdPessoa() {
     return idPessoa;
 }
@@ -48,5 +51,11 @@ public void setIdPessoa(Long idPessoa) {
     }
     public void setSenha(String senha){
         this.senha = senha; 
+    }
+    public boolean isPremium(){
+        return premium;
+    }
+    public void setPremium(boolean premium){
+        this.premium = premium;
     }
 }

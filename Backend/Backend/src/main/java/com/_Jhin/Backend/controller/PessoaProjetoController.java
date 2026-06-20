@@ -4,6 +4,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com._Jhin.Backend.Service.PessoaProjetoService;
+import com._Jhin.Backend.dto.AdicionarPessoaProjetoRequest;
 import com._Jhin.Backend.model.PessoaProjeto;
 import java.util.List;
 
@@ -96,5 +97,12 @@ public void alterarNivelPessoa(
             idPessoaAlvo,
             idProjeto,
             novoNivel);
+}
+@PostMapping("/adicionar-por-email/{idPessoaLogada}")
+public PessoaProjeto adicionarPessoaPorEmail(
+        @PathVariable Long idPessoaLogada,
+        @RequestBody AdicionarPessoaProjetoRequest request) {
+
+    return service.adicionarPessoaPorEmail(idPessoaLogada, request);
 }
 }

@@ -61,6 +61,7 @@ public ProjetoService(
     public void deletarProjeto(Long id){
         repository.deleteById(id);
     }
+    
    @Transactional
     public void deletarProjetoComPermissao(Long idPessoa, Long idProjeto) {
 
@@ -81,9 +82,7 @@ public ProjetoService(
 public List<Projeto> listarTodos() {
     return repository.findAll();
 }
-public Projeto salvarComCriador(
-        Long idPessoa,
-        Projeto projeto) {
+public Projeto salvarComCriador(Long idPessoa, Projeto projeto) {
 
     Projeto projetoSalvo = salvar(projeto);
 
@@ -97,7 +96,7 @@ public Projeto salvarComCriador(
     pessoaProjeto.setProjeto(projetoSalvo);
     pessoaProjeto.setNivelAcesso(3);
 
-    pessoaProjetoRepository.save(pessoaProjeto);
+    pessoaProjetoService.salvar(pessoaProjeto);
 
     return projetoSalvo;
 }
