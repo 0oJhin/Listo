@@ -60,5 +60,11 @@ public Pessoa buscarPorEmail(
 
     return service.buscarPorEmail(email);
 }
-    
+    @PutMapping("/premium/{idPessoaLogada}/{idPessoa}")
+public void tornarPremium(
+        @PathVariable Long idPessoaLogada,
+        @PathVariable Long idPessoa) {
+
+    service.tornarPremium(idPessoaLogada, idPessoa);
+}
 }

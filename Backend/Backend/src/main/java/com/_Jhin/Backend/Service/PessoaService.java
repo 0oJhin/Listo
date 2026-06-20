@@ -72,4 +72,22 @@ public void atualizarPessoaComPermissao(
 public Pessoa buscarPorEmail(String email) {
     return repository.findByEmail(email);
 }
+
+public void tornarPremium(
+        Long idPessoaLogada,
+        Long idPessoa) {
+
+    if (!idPessoaLogada.equals(idPessoa)) {
+        throw new RuntimeException(
+                "Você só pode alterar sua própria assinatura");
+    }
+
+    Pessoa pessoa = repository.findById(idPessoa)
+            .orElseThrow(() ->
+                    new RuntimeException("Pessoa não encontrada"));
+
+    pessoa.setPremium(true);
+
+    repository.save(pessoa);
+}
 }
