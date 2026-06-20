@@ -9,7 +9,8 @@ CREATE TABLE pessoa (
     id_pessoa SERIAL PRIMARY KEY,
     nome_pessoa VARCHAR(100) NOT NULL,
     email VARCHAR(100) NOT NULL UNIQUE,
-    senha VARCHAR(255) NOT NULL
+    senha VARCHAR(255) NOT NULL,
+    premium BOOLEAN DEFAULT FALSE
 );
 
 
@@ -23,7 +24,7 @@ CREATE TABLE lista (
     id_lista SERIAL PRIMARY KEY,
     nome_lista VARCHAR(100) NOT NULL,
     feito BOOLEAN DEFAULT FALSE,
-    id_projeto INTEGER,
+    id_projeto INTEGER NOT NULL,
 
     CONSTRAINT fk_lista_projeto
         FOREIGN KEY (id_projeto)
@@ -38,7 +39,7 @@ CREATE TABLE item_lista (
     quantidade INTEGER DEFAULT 1,
     concluido BOOLEAN DEFAULT FALSE,
     tarefa BOOLEAN DEFAULT FALSE,
-    id_lista INTEGER,
+    id_lista INTEGER NOT NULL,
 
     CONSTRAINT fk_item_lista
         FOREIGN KEY (id_lista)
@@ -49,9 +50,9 @@ CREATE TABLE item_lista (
 
 CREATE TABLE pessoa_projeto (
     id_pessoa_projeto SERIAL PRIMARY KEY,
-    id_pessoa INTEGER,
-    id_projeto INTEGER,
-    nivel_acesso INTEGER,
+    id_pessoa INTEGER NOT NULL,
+    id_projeto INTEGER NOT NULL,
+    nivel_acesso INTEGER NOT NULL,
 
     CONSTRAINT fk_pessoa_projeto_pessoa
         FOREIGN KEY (id_pessoa)
@@ -61,5 +62,11 @@ CREATE TABLE pessoa_projeto (
     CONSTRAINT fk_pessoa_projeto_projeto
         FOREIGN KEY (id_projeto)
         REFERENCES projeto(id_projeto)
-        ON DELETE CASCADE
+        ON DELETE CASCADE,
+
+    CONSTRAINT chk_nivel_acesso
+        CHECK (nivel_acesso IN (1, 2, 3)),
+
+    CONSTRAINT uk_pessoa_projeto
+        UNIQUE (id_pessoa, id_projeto)
 );
