@@ -90,4 +90,21 @@ public void tornarPremium(
 
     repository.save(pessoa);
 }
+public void cancelarPremium(
+        Long idPessoaLogada,
+        Long idPessoa) {
+
+    if (!idPessoaLogada.equals(idPessoa)) {
+        throw new RuntimeException(
+                "Você só pode alterar sua própria assinatura");
+    }
+
+    Pessoa pessoa = repository.findById(idPessoa)
+            .orElseThrow(() ->
+                    new RuntimeException("Pessoa não encontrada"));
+
+    pessoa.setPremium(false);
+
+    repository.save(pessoa);
+}
 }

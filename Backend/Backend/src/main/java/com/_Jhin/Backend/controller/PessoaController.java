@@ -67,4 +67,11 @@ public void tornarPremium(
 
     service.tornarPremium(idPessoaLogada, idPessoa);
 }
+@PutMapping("/cancelar-premium/{idPessoaLogada}/{idPessoa}")
+public void cancelarPremium(
+        @PathVariable Long idPessoaLogada,
+        @PathVariable Long idPessoa) {
+
+    service.cancelarPremium(idPessoaLogada, idPessoa);
+}
 }
