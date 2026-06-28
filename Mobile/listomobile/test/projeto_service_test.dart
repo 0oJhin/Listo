@@ -25,6 +25,7 @@ void main() {
     final projetos = await service.listarPorPessoa(1);
 
     expect(projetos.single.nomeProjeto, 'Projeto do João');
+    expect(projetos.single.nivelAcesso, 3);
   });
 
   test('cria projeto e vincula o criador como nível 3', () async {

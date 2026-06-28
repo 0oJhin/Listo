@@ -3,13 +3,31 @@ class PessoaModel {
   final String nomePessoa;
   final String email;
   final String senha;
+  final bool premium;
 
   const PessoaModel({
     this.idPessoa,
     required this.nomePessoa,
     required this.email,
     required this.senha,
+    this.premium = false,
   });
+
+  PessoaModel copyWith({
+    int? idPessoa,
+    String? nomePessoa,
+    String? email,
+    String? senha,
+    bool? premium,
+  }) {
+    return PessoaModel(
+      idPessoa: idPessoa ?? this.idPessoa,
+      nomePessoa: nomePessoa ?? this.nomePessoa,
+      email: email ?? this.email,
+      senha: senha ?? this.senha,
+      premium: premium ?? this.premium,
+    );
+  }
 
   Map<String, dynamic> toJson() {
     return {
@@ -17,6 +35,7 @@ class PessoaModel {
       'nomePessoa': nomePessoa,
       'email': email,
       'senha': senha,
+      'premium': premium,
     };
   }
 
@@ -26,6 +45,7 @@ class PessoaModel {
       nomePessoa: (json['nomePessoa'] ?? '').toString(),
       email: (json['email'] ?? '').toString(),
       senha: (json['senha'] ?? '').toString(),
+      premium: _parseBool(json['premium']),
     );
   }
 
@@ -39,5 +59,10 @@ class PessoaModel {
     if (value == null) return null;
     if (value is int) return value;
     return int.tryParse(value.toString());
+  }
+
+  static bool _parseBool(dynamic value) {
+    if (value is bool) return value;
+    return value.toString().toLowerCase() == 'true';
   }
 }

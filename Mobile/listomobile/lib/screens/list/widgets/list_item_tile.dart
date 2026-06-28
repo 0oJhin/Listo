@@ -5,6 +5,7 @@ import '../../../models/item_lista_model.dart';
 class ListItemTile extends StatelessWidget {
   final ItemListaModel item;
   final bool busy;
+  final bool canEdit;
   final ValueChanged<bool> onCompletedChanged;
   final VoidCallback onDecrease;
   final VoidCallback onIncrease;
@@ -14,6 +15,7 @@ class ListItemTile extends StatelessWidget {
     super.key,
     required this.item,
     required this.busy,
+    required this.canEdit,
     required this.onCompletedChanged,
     required this.onDecrease,
     required this.onIncrease,
@@ -64,7 +66,7 @@ class ListItemTile extends StatelessWidget {
                 ],
               ),
             ),
-            if (!item.isTarefa)
+            if (!item.isTarefa && canEdit)
               Container(
                 decoration: BoxDecoration(
                   color: Theme.of(context).colorScheme.surfaceContainerHighest,
@@ -92,11 +94,20 @@ class ListItemTile extends StatelessWidget {
                   ],
                 ),
               ),
-            IconButton(
-              onPressed: busy ? null : onDelete,
-              tooltip: 'Apagar',
-              icon: const Icon(Icons.delete_outline),
-            ),
+            if (!item.isTarefa && !canEdit)
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 12),
+                child: Text(
+                  'Qtd. ${item.quantidade}',
+                  style: const TextStyle(fontWeight: FontWeight.bold),
+                ),
+              ),
+            if (canEdit)
+              IconButton(
+                onPressed: busy ? null : onDelete,
+                tooltip: 'Apagar',
+                icon: const Icon(Icons.delete_outline),
+              ),
           ],
         ),
       ),

@@ -9,7 +9,7 @@ class ProjectListCard extends StatelessWidget {
   final Color color;
   final int itemCount;
   final VoidCallback onOpen;
-  final ValueChanged<ListAction> onAction;
+  final ValueChanged<ListAction>? onAction;
 
   const ProjectListCard({
     super.key,
@@ -17,7 +17,7 @@ class ProjectListCard extends StatelessWidget {
     required this.color,
     required this.itemCount,
     required this.onOpen,
-    required this.onAction,
+    this.onAction,
   });
 
   @override
@@ -62,33 +62,34 @@ class ProjectListCard extends StatelessWidget {
                   ],
                 ),
               ),
-              PopupMenuButton<ListAction>(
-                tooltip: 'Opções da lista',
-                onSelected: onAction,
-                itemBuilder: (_) => const [
-                  PopupMenuItem(
-                    value: ListAction.rename,
-                    child: ListTile(
-                      leading: Icon(Icons.edit_outlined),
-                      title: Text('Renomear'),
+              if (onAction != null)
+                PopupMenuButton<ListAction>(
+                  tooltip: 'Opções da lista',
+                  onSelected: onAction,
+                  itemBuilder: (_) => const [
+                    PopupMenuItem(
+                      value: ListAction.rename,
+                      child: ListTile(
+                        leading: Icon(Icons.edit_outlined),
+                        title: Text('Renomear'),
+                      ),
                     ),
-                  ),
-                  PopupMenuItem(
-                    value: ListAction.duplicate,
-                    child: ListTile(
-                      leading: Icon(Icons.copy_outlined),
-                      title: Text('Gerar uma cópia'),
+                    PopupMenuItem(
+                      value: ListAction.duplicate,
+                      child: ListTile(
+                        leading: Icon(Icons.copy_outlined),
+                        title: Text('Gerar uma cópia'),
+                      ),
                     ),
-                  ),
-                  PopupMenuItem(
-                    value: ListAction.delete,
-                    child: ListTile(
-                      leading: Icon(Icons.delete_outline),
-                      title: Text('Apagar'),
+                    PopupMenuItem(
+                      value: ListAction.delete,
+                      child: ListTile(
+                        leading: Icon(Icons.delete_outline),
+                        title: Text('Apagar'),
+                      ),
                     ),
-                  ),
-                ],
-              ),
+                  ],
+                ),
             ],
           ),
         ),

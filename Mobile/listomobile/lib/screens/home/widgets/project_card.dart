@@ -41,16 +41,17 @@ class ProjectCard extends StatelessWidget {
                 ),
               ),
             ),
-            Positioned(
-              top: 2,
-              right: 2,
-              child: IconButton(
-                onPressed: onOptionsPressed,
-                tooltip: 'Opções do projeto',
-                visualDensity: VisualDensity.compact,
-                icon: const Icon(Icons.more_vert),
+            if (onOptionsPressed != null)
+              Positioned(
+                top: 2,
+                right: 2,
+                child: IconButton(
+                  onPressed: onOptionsPressed,
+                  tooltip: 'Opções do projeto',
+                  visualDensity: VisualDensity.compact,
+                  icon: const Icon(Icons.more_vert),
+                ),
               ),
-            ),
           ],
         ),
       ),

@@ -120,6 +120,62 @@ class PessoaService {
     }
   }
 
+  Future<void> tornarPremium(int idPessoa) async {
+    try {
+      final response = await _client
+          .put(Uri.parse('$baseUrl/Pessoa/premium/$idPessoa/$idPessoa'))
+          .timeout(timeout);
+
+      if (response.statusCode == 200 || response.statusCode == 204) return;
+
+      throw PessoaServiceException(
+        _mensagemDaResposta(
+          response,
+          padrao: 'Não foi possível ativar o plano Premium.',
+        ),
+      );
+    } on PessoaServiceException {
+      rethrow;
+    } on TimeoutException {
+      throw const PessoaServiceException(
+        'O servidor demorou para confirmar o pagamento.',
+      );
+    } on http.ClientException {
+      throw const PessoaServiceException(
+        'Não foi possível conectar ao servidor.',
+      );
+    }
+  }
+
+  Future<void> cancelarPremium(int idPessoa) async {
+    try {
+      final response = await _client
+          .put(
+            Uri.parse('$baseUrl/Pessoa/cancelar-premium/$idPessoa/$idPessoa'),
+          )
+          .timeout(timeout);
+
+      if (response.statusCode == 200 || response.statusCode == 204) return;
+
+      throw PessoaServiceException(
+        _mensagemDaResposta(
+          response,
+          padrao: 'Não foi possível cancelar o plano Premium.',
+        ),
+      );
+    } on PessoaServiceException {
+      rethrow;
+    } on TimeoutException {
+      throw const PessoaServiceException(
+        'O servidor demorou para cancelar a assinatura.',
+      );
+    } on http.ClientException {
+      throw const PessoaServiceException(
+        'Não foi possível conectar ao servidor.',
+      );
+    }
+  }
+
   String _mensagemDaResposta(http.Response response, {required String padrao}) {
     if (response.body.trim().isEmpty) return padrao;
 

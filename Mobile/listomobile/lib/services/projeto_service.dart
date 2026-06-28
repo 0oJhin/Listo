@@ -26,9 +26,14 @@ class ProjetoService {
 
     return data
         .whereType<Map<String, dynamic>>()
-        .map((vinculo) => vinculo['projeto'])
-        .whereType<Map<String, dynamic>>()
-        .map(ProjetoModel.fromJson)
+        .map((vinculo) {
+          final projeto = vinculo['projeto'];
+          if (projeto is! Map<String, dynamic>) return null;
+          return ProjetoModel.fromJson(
+            projeto,
+          ).copyWith(nivelAcesso: _parseInt(vinculo['nivelAcesso']) ?? 1);
+        })
+        .whereType<ProjetoModel>()
         .toList();
   }
 
@@ -68,7 +73,7 @@ class ProjetoService {
       );
     }
 
-    return projetoCriado;
+    return projetoCriado.copyWith(nivelAcesso: 3);
   }
 
   Future<ProjetoModel> criarProjeto(ProjetoModel projeto) async {
@@ -148,5 +153,10 @@ class ProjetoService {
 
   String _mensagemErro(String acao, http.Response response) {
     return 'Erro ao $acao. Código: ${response.statusCode}. Resposta: ${response.body}';
+  }
+
+  int? _parseInt(dynamic value) {
+    if (value is int) return value;
+    return int.tryParse(value?.toString() ?? '');
   }
 }

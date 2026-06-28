@@ -9,8 +9,14 @@ import 'widgets/list_item_tile.dart';
 class ListScreen extends StatefulWidget {
   final ListaModel lista;
   final int idPessoa;
+  final int accessLevel;
 
-  const ListScreen({super.key, required this.lista, required this.idPessoa});
+  const ListScreen({
+    super.key,
+    required this.lista,
+    required this.idPessoa,
+    required this.accessLevel,
+  });
 
   @override
   State<ListScreen> createState() => _ListScreenState();
@@ -21,6 +27,8 @@ class _ListScreenState extends State<ListScreen> {
   final List<ItemListaModel> _items = [];
   final Set<int> _busyItems = {};
   bool _loading = false;
+
+  bool get _canEdit => widget.accessLevel >= 2;
 
   @override
   void initState() {
@@ -48,6 +56,7 @@ class _ListScreenState extends State<ListScreen> {
   }
 
   Future<void> _add() async {
+    if (!_canEdit) return;
     final result = await showDialog<ItemFormResult>(
       context: context,
       builder: (_) => const ItemFormDialog(),
@@ -83,6 +92,7 @@ class _ListScreenState extends State<ListScreen> {
   }
 
   Future<void> _changeQuantity(ItemListaModel item, int delta) async {
+    if (!_canEdit) return;
     final quantity = item.quantidade + delta;
     if (quantity < 1) return;
     final updated = item.copyWith(quantidade: quantity);
@@ -93,6 +103,7 @@ class _ListScreenState extends State<ListScreen> {
   }
 
   Future<void> _delete(ItemListaModel item) async {
+    if (!_canEdit) return;
     final id = item.idItem;
     if (id == null) return;
     final confirmed = await showDialog<bool>(
@@ -156,11 +167,13 @@ class _ListScreenState extends State<ListScreen> {
     final completed = _items.where((item) => item.concluido).length;
     return Scaffold(
       appBar: AppBar(title: Text(widget.lista.nomeLista)),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: _loading ? null : _add,
-        icon: const Icon(Icons.add),
-        label: const Text('Adicionar'),
-      ),
+      floatingActionButton: _canEdit
+          ? FloatingActionButton.extended(
+              onPressed: _loading ? null : _add,
+              icon: const Icon(Icons.add),
+              label: const Text('Adicionar'),
+            )
+          : null,
       body: RefreshIndicator(
         onRefresh: _load,
         child: ListView(
@@ -218,6 +231,7 @@ class _ListScreenState extends State<ListScreen> {
               (item) => ListItemTile(
                 item: item,
                 busy: item.idItem != null && _busyItems.contains(item.idItem),
+                canEdit: _canEdit,
                 onCompletedChanged: (value) => _toggle(item, value),
                 onDecrease: () => _changeQuantity(item, -1),
                 onIncrease: () => _changeQuantity(item, 1),

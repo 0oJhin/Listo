@@ -11,10 +11,12 @@ import 'home/widgets/empty_projects_prompt.dart';
 import 'home/widgets/home_header.dart';
 import 'home/widgets/home_shortcut_button.dart';
 import 'home/widgets/project_card.dart';
+import 'home/widgets/project_limit_dialog.dart';
 import 'home/widgets/project_options_sheet.dart';
 import 'home/widgets/rename_project_dialog.dart';
 import 'home/widgets/settings_dialog.dart';
 import 'login_screen.dart';
+import 'plans/plan_screen.dart';
 import 'project/project_screen.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -29,6 +31,7 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   final _service = ProjetoService();
   final List<ProjetoModel> _projetos = [];
+  late PessoaModel _pessoa = widget.pessoa;
   bool _carregando = false;
 
   @override
@@ -38,7 +41,7 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Future<void> _carregarProjetos() async {
-    final idPessoa = widget.pessoa.idPessoa;
+    final idPessoa = _pessoa.idPessoa;
     if (idPessoa == null) return;
 
     setState(() => _carregando = true);
@@ -58,13 +61,34 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Future<void> _abrirNovoProjeto() async {
+    if (_carregando) {
+      _mensagem('Aguarde o carregamento dos seus projetos.');
+      return;
+    }
+
+    final ownedProjects = _projetos.where(
+      (project) => project.nivelAcesso == 3,
+    );
+    if (!_pessoa.premium && ownedProjects.isNotEmpty) {
+      await showDialog<void>(
+        context: context,
+        builder: (dialogContext) => ProjectLimitDialog(
+          onManagePlan: () {
+            Navigator.pop(dialogContext);
+            _abrirPlanos();
+          },
+        ),
+      );
+      return;
+    }
+
     final nome = await showDialog<String>(
       context: context,
       builder: (_) => const CreateProjectDialog(),
     );
     if (nome == null || !mounted) return;
 
-    final idPessoa = widget.pessoa.idPessoa;
+    final idPessoa = _pessoa.idPessoa;
     if (idPessoa == null) {
       _mensagem('Não foi possível identificar o usuário.');
       return;
@@ -89,18 +113,26 @@ class _HomeScreenState extends State<HomeScreen> {
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(texto)));
   }
 
-  void _abrirProjeto(ProjetoModel projeto) {
-    final idPessoa = widget.pessoa.idPessoa;
+  Future<void> _abrirProjeto(ProjetoModel projeto) async {
+    final idPessoa = _pessoa.idPessoa;
     if (idPessoa == null || projeto.idProjeto == null) {
       _mensagem('Não foi possível abrir este projeto.');
       return;
     }
-    Navigator.push(
+    final updatedProject = await Navigator.push<ProjetoModel>(
       context,
       MaterialPageRoute(
         builder: (_) => ProjectScreen(projeto: projeto, idPessoa: idPessoa),
       ),
     );
+    if (updatedProject != null && mounted) {
+      setState(() {
+        final index = _projetos.indexWhere(
+          (item) => item.idProjeto == updatedProject.idProjeto,
+        );
+        if (index >= 0) _projetos[index] = updatedProject;
+      });
+    }
   }
 
   Future<void> _abrirOpcoesProjeto(ProjetoModel projeto) async {
@@ -112,7 +144,11 @@ class _HomeScreenState extends State<HomeScreen> {
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
       ),
-      builder: (_) => ProjectOptionsSheet(projectName: projeto.nomeProjeto),
+      builder: (_) => ProjectOptionsSheet(
+        projectName: projeto.nomeProjeto,
+        canRename: projeto.nivelAcesso >= 2,
+        canDelete: projeto.nivelAcesso == 3,
+      ),
     );
 
     if (!mounted || action == null) return;
@@ -184,7 +220,7 @@ class _HomeScreenState extends State<HomeScreen> {
     if (confirmado != true || !mounted) return;
 
     final idProjeto = projeto.idProjeto;
-    final idPessoa = widget.pessoa.idPessoa;
+    final idPessoa = _pessoa.idPessoa;
     if (idProjeto == null || idPessoa == null) {
       _mensagem('Não foi possível identificar o projeto ou usuário.');
       return;
@@ -216,6 +252,10 @@ class _HomeScreenState extends State<HomeScreen> {
         return SettingsDialog(
           darkModeEnabled: app.darkModeEnabled,
           onDarkModeChanged: app.setDarkMode,
+          onManagePlan: () {
+            Navigator.pop(dialogContext);
+            _abrirPlanos();
+          },
           onLogout: () {
             Navigator.pop(dialogContext);
             Navigator.pushAndRemoveUntil(
@@ -229,9 +269,25 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
+  Future<void> _abrirPlanos() async {
+    final pessoaAtualizada = await Navigator.push<PessoaModel>(
+      context,
+      MaterialPageRoute(builder: (_) => PlanScreen(pessoa: _pessoa)),
+    );
+    if (pessoaAtualizada != null && mounted) {
+      setState(() => _pessoa = pessoaAtualizada);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final recentes = _projetos.take(3).toList();
+    final meusProjetos = _projetos
+        .where((projeto) => projeto.nivelAcesso == 3)
+        .toList();
+    final projetosTerceiros = _projetos
+        .where((projeto) => projeto.nivelAcesso != 3)
+        .toList();
     final semProjetos = !_carregando && _projetos.isEmpty;
 
     return Scaffold(
@@ -242,7 +298,7 @@ class _HomeScreenState extends State<HomeScreen> {
             physics: const AlwaysScrollableScrollPhysics(),
             slivers: [
               SliverToBoxAdapter(
-                child: HomeHeader(userName: widget.pessoa.nomePessoa),
+                child: HomeHeader(userName: _pessoa.nomePessoa),
               ),
               if (_carregando)
                 const SliverToBoxAdapter(
@@ -298,10 +354,11 @@ class _HomeScreenState extends State<HomeScreen> {
                           width: 150,
                           child: ProjectCard(
                             name: recentes[index].nomeProjeto,
-                            color: _corProjeto(index),
+                            color: _corProjeto(recentes[index]),
                             onTap: () => _abrirProjeto(recentes[index]),
-                            onOptionsPressed: () =>
-                                _abrirOpcoesProjeto(recentes[index]),
+                            onOptionsPressed: recentes[index].nivelAcesso >= 2
+                                ? () => _abrirOpcoesProjeto(recentes[index])
+                                : null,
                           ),
                         ),
                       ),
@@ -327,7 +384,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                 ),
                 SliverPadding(
-                  padding: const EdgeInsets.fromLTRB(24, 0, 24, 32),
+                  padding: const EdgeInsets.fromLTRB(24, 0, 24, 18),
                   sliver: SliverGrid(
                     gridDelegate:
                         const SliverGridDelegateWithMaxCrossAxisExtent(
@@ -337,19 +394,52 @@ class _HomeScreenState extends State<HomeScreen> {
                           mainAxisSpacing: 14,
                         ),
                     delegate: SliverChildBuilderDelegate((_, index) {
-                      if (index == _projetos.length) {
+                      if (index == meusProjetos.length) {
                         return AddProjectCard(onPressed: _abrirNovoProjeto);
                       }
+                      final projeto = meusProjetos[index];
                       return ProjectCard(
-                        name: _projetos[index].nomeProjeto,
-                        color: _corProjeto(index),
-                        onTap: () => _abrirProjeto(_projetos[index]),
-                        onOptionsPressed: () =>
-                            _abrirOpcoesProjeto(_projetos[index]),
+                        name: projeto.nomeProjeto,
+                        color: _corProjeto(projeto),
+                        onTap: () => _abrirProjeto(projeto),
+                        onOptionsPressed: projeto.nivelAcesso >= 2
+                            ? () => _abrirOpcoesProjeto(projeto)
+                            : null,
                       );
-                    }, childCount: _projetos.length + 1),
+                    }, childCount: meusProjetos.length + 1),
                   ),
                 ),
+                if (projetosTerceiros.isNotEmpty) ...[
+                  const SliverPadding(
+                    padding: EdgeInsets.fromLTRB(20, 4, 20, 0),
+                    sliver: SliverToBoxAdapter(
+                      child: SectionTitle(title: 'Projetos de terceiros'),
+                    ),
+                  ),
+                  SliverPadding(
+                    padding: const EdgeInsets.fromLTRB(24, 0, 24, 32),
+                    sliver: SliverGrid(
+                      gridDelegate:
+                          const SliverGridDelegateWithMaxCrossAxisExtent(
+                            maxCrossAxisExtent: 210,
+                            mainAxisExtent: 130,
+                            crossAxisSpacing: 14,
+                            mainAxisSpacing: 14,
+                          ),
+                      delegate: SliverChildBuilderDelegate((_, index) {
+                        final projeto = projetosTerceiros[index];
+                        return ProjectCard(
+                          name: projeto.nomeProjeto,
+                          color: _corProjeto(projeto),
+                          onTap: () => _abrirProjeto(projeto),
+                          onOptionsPressed: projeto.nivelAcesso >= 2
+                              ? () => _abrirOpcoesProjeto(projeto)
+                              : null,
+                        );
+                      }, childCount: projetosTerceiros.length),
+                    ),
+                  ),
+                ],
               ],
             ],
           ),
@@ -358,7 +448,9 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Color _corProjeto(int index) {
-    return index.isEven ? const Color(0xFFC5DD64) : const Color(0xFF829764);
+  Color _corProjeto(ProjetoModel projeto) {
+    return projeto.nivelAcesso == 3
+        ? const Color(0xFFC5DD64)
+        : const Color(0xFF829764);
   }
 }

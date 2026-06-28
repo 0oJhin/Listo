@@ -1,19 +1,23 @@
 class ProjetoModel {
   final int? idProjeto;
   final String nomeProjeto;
+  final int nivelAcesso;
 
   const ProjetoModel({
     this.idProjeto,
     required this.nomeProjeto,
+    this.nivelAcesso = 3,
   });
 
   ProjetoModel copyWith({
     int? idProjeto,
     String? nomeProjeto,
+    int? nivelAcesso,
   }) {
     return ProjetoModel(
       idProjeto: idProjeto ?? this.idProjeto,
       nomeProjeto: nomeProjeto ?? this.nomeProjeto,
+      nivelAcesso: nivelAcesso ?? this.nivelAcesso,
     );
   }
 
@@ -29,7 +33,9 @@ class ProjetoModel {
       idProjeto: _parseInt(
         json['idProjeto'] ?? json['id_Projeto'] ?? json['id_projeto'],
       ),
-      nomeProjeto: (json['nomeProjeto'] ?? json['nome_projeto'] ?? '').toString(),
+      nomeProjeto: (json['nomeProjeto'] ?? json['nome_projeto'] ?? '')
+          .toString(),
+      nivelAcesso: _parseInt(json['nivelAcesso']) ?? 3,
     );
   }
 

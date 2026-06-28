@@ -22,6 +22,7 @@ void main() {
           'nomePessoa': 'João',
           'email': 'joao@email.com',
           'senha': '1234',
+          'premium': true,
         }),
         200,
         headers: {'content-type': 'application/json; charset=utf-8'},
@@ -35,6 +36,7 @@ void main() {
 
     expect(pessoa.idPessoa, 1);
     expect(pessoa.email, 'joao@email.com');
+    expect(pessoa.premium, isTrue);
   });
 
   test(
@@ -93,4 +95,30 @@ void main() {
       );
     },
   );
+
+  test('ativa o plano premium da própria pessoa', () async {
+    final client = MockClient((request) async {
+      expect(request.method, 'PUT');
+      expect(request.url.path, '/Pessoa/premium/1/1');
+      return http.Response('', 204);
+    });
+
+    await PessoaService(
+      baseUrl: 'http://api.test',
+      client: client,
+    ).tornarPremium(1);
+  });
+
+  test('cancela o plano premium da própria pessoa', () async {
+    final client = MockClient((request) async {
+      expect(request.method, 'PUT');
+      expect(request.url.path, '/Pessoa/cancelar-premium/1/1');
+      return http.Response('', 204);
+    });
+
+    await PessoaService(
+      baseUrl: 'http://api.test',
+      client: client,
+    ).cancelarPremium(1);
+  });
 }
